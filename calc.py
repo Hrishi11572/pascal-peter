@@ -2,6 +2,7 @@
 
 INTEGER = 'INTEGER '
 PLUS = 'PLUS'
+MINUS = 'MINUS'
 EOF = 'EOF'
 WHITESPACE = 'WHITESPACE'
 
@@ -56,6 +57,11 @@ class Interpreter :
                 token = Token(PLUS, '+')
                 return token
             
+            if text[self.pos] == '-':
+                self.pos += 1
+                token = Token(MINUS, '-')
+                return token 
+            
             self.error() # otherwise 
               
         return Token(EOF, None)
@@ -72,19 +78,28 @@ class Interpreter :
             self.error()
         
     def expr(self):
+        # explicitly evaluating INTEGER operator INTEGER
+        
         self.current_token = self.get_next_token()
         
         left = self.current_token
         self.eat(INTEGER)
         
         op = self.current_token
-        self.eat(PLUS)
+        if op.type == PLUS: 
+            self.eat(PLUS)
+        else: 
+            self.eat(MINUS)
         
         right = self.current_token
         self.eat(INTEGER)
         
-        result = left.value + right.value
-        return result 
+        if op.type == PLUS:
+            return left.value + right.value
+        elif op.type == MINUS:
+            return left.value - right.value
+        else : 
+            self.error()      
         
 
 def main(): 
