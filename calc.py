@@ -43,6 +43,17 @@ class Interpreter :
     def error(self): 
         raise Exception("Error in parsing the input")
     
+    def integer(self):
+        # parse the multi-digit integer 
+        result = ''
+        text = self.text
+        
+        while self.pos < len(text) and text[self.pos].isdigit():
+            result += text[self.pos]
+            self.pos += 1
+        
+        return int(result)
+    
     def get_next_token(self): 
         '''
         This is the Lexical analyser or lexer or tokenizer 
@@ -56,43 +67,44 @@ class Interpreter :
         current_char = text[self.pos]
         
         if current_char.isdigit(): 
-            token = Token(INTEGER, int(current_char))
-            self.pos += 1 
+            token = Token(INTEGER, self.integer())
             return token
         
         if current_char == '+': 
-            token = Token(PLUS, current_char)
             self.pos += 1
+            token = Token(PLUS, '+')
             return token 
         
         self.error() # otherwise something is wrong 
     
     def eat(self, token_type): 
-        # compare the current token type with the passed token type and if they match then "eat" the current token and assign the next token to the self.current_token, otherwise raise an exception 
-        
+        """
+        compare the current token type with the passed token type and 
+        if they match then "eat" the current token and assign the next 
+        token to the self.current_token, otherwise raise an exception 
+        """
         if self.current_token.type == token_type: 
             self.current_token = self.get_next_token()
         else: 
             self.error()
+
     
     def expr(self): 
         # evaluate : INTEGER PLUS INTEGER
-        # set current token to the first token taken from the input 
+        
         self.current_token = self.get_next_token()
         
-        # for now the current_token is a single digit int
         left = self.current_token
         self.eat(INTEGER)
         
-        # the next token should be a plus sign 
+
         op = self.current_token
         self.eat(PLUS)
         
-        # ideally the next token should be a single digit int 
+
         right = self.current_token
         self.eat(INTEGER)
         
-        # after the above call the self.current_taken = EOF 
         result = left.value + right.value 
         return result 
     
@@ -111,5 +123,4 @@ def main():
         print(result)
 
 if __name__ == '__main__': 
-    main()        
-        
+    main()
