@@ -1,8 +1,10 @@
-"""Token Types"""
+""" Token Types """
 
 INTEGER = 'INTEGER '
 PLUS = 'PLUS'
 MINUS = 'MINUS'
+MULT = 'MULT'
+DIV = 'DIV'
 EOF = 'EOF'
 WHITESPACE = 'WHITESPACE'
 
@@ -26,7 +28,6 @@ class Interpreter :
     def error(self): 
         raise Exception("Error in parsing the input")
     
-
     def integer(self):
         """parse the multi-digit integer"""
         result = ''
@@ -36,7 +37,6 @@ class Interpreter :
             result += text[self.pos]
             self.pos += 1
         return int(result)
-    
     
     def get_next_token(self):
         text = self.text 
@@ -62,8 +62,17 @@ class Interpreter :
                 token = Token(MINUS, '-')
                 return token 
             
+            if text[self.pos] == '*':
+                self.pos += 1
+                token = Token(MULT, '*')
+                return token 
+            
+            if text[self.pos] == '/':
+                self.pos += 1
+                token = Token(DIV, '/')
+                return token 
+            
             self.error() # otherwise 
-              
         return Token(EOF, None)
     
     def eat(self, token_type): 
@@ -78,7 +87,7 @@ class Interpreter :
             self.error()
         
     def expr(self):
-        # explicitly evaluating INTEGER operator INTEGER
+        # explicitly evaluating INTEGER operator INTEGER operator INTEGER operator .... (for only + and - now)
         
         self.current_token = self.get_next_token()
         
@@ -88,8 +97,12 @@ class Interpreter :
         op = self.current_token
         if op.type == PLUS: 
             self.eat(PLUS)
-        else: 
+        elif op.type == MULT: 
+            self.eat(MULT)
+        elif op.type == MINUS:
             self.eat(MINUS)
+        elif op.type == DIV: 
+            self.eat(DIV)
         
         right = self.current_token
         self.eat(INTEGER)
@@ -98,8 +111,12 @@ class Interpreter :
             return left.value + right.value
         elif op.type == MINUS:
             return left.value - right.value
-        else : 
-            self.error()      
+        elif op.type == MULT : 
+            return left.value * right.value
+        elif op.type == DIV:
+            return left.value / right.value
+        
+        self.error()      
         
 
 def main(): 
