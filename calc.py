@@ -91,23 +91,17 @@ class Interpreter :
         result = self.current_token.value
         self.eat(INTEGER)
         
-        while self.current_token.type is not EOF: 
-            if self.current_token.type is INTEGER: 
-                if prev_op.type == PLUS: 
-                    result += self.current_token.value
-                elif prev_op.type == MINUS: 
-                    result -= self.current_token.value
-                
-                self.eat(INTEGER)
-            else :
-                prev_op = self.current_token
-                self.eat(prev_op.type)
+        while self.current_token.type in (PLUS, MINUS): 
+            token = self.current_token
+            if token.type == PLUS:
+                self.eat(PLUS)
+                result += self.current_token.value
+            elif token.type == MINUS:
+                self.eat(MINUS)
+                result -= self.current_token.value
+            self.eat(INTEGER)
         
-        if result is None:
-            self.error()
-        else : 
-            return result
-        
+        return result
 
 def main(): 
     while True: 
