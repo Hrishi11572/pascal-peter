@@ -91,7 +91,7 @@ class Interpreter :
         result = self.current_token.value
         self.eat(INTEGER)
         
-        while self.current_token.type in (PLUS, MINUS): 
+        while self.current_token.type in (PLUS, MINUS, MULT, DIV): 
             token = self.current_token
             if token.type == PLUS:
                 self.eat(PLUS)
@@ -99,6 +99,12 @@ class Interpreter :
             elif token.type == MINUS:
                 self.eat(MINUS)
                 result -= self.current_token.value
+            elif token.type == MULT:
+                self.eat(MULT)
+                result *= self.current_token.value
+            elif token.type == DIV: 
+                self.eat(DIV)
+                result /= self.current_token.value
             self.eat(INTEGER)
         
         return result
