@@ -86,37 +86,27 @@ class Interpreter :
         else: 
             self.error()
         
-    def expr(self):
-        # explicitly evaluating INTEGER operator INTEGER operator INTEGER operator .... (for only + and - now)
-        
+    def expr(self):  
         self.current_token = self.get_next_token()
-        
-        left = self.current_token
+        result = self.current_token.value
         self.eat(INTEGER)
         
-        op = self.current_token
-        if op.type == PLUS: 
-            self.eat(PLUS)
-        elif op.type == MULT: 
-            self.eat(MULT)
-        elif op.type == MINUS:
-            self.eat(MINUS)
-        elif op.type == DIV: 
-            self.eat(DIV)
+        while self.current_token.type is not EOF: 
+            if self.current_token.type is INTEGER: 
+                if prev_op.type == PLUS: 
+                    result += self.current_token.value
+                elif prev_op.type == MINUS: 
+                    result -= self.current_token.value
+                
+                self.eat(INTEGER)
+            else :
+                prev_op = self.current_token
+                self.eat(prev_op.type)
         
-        right = self.current_token
-        self.eat(INTEGER)
-        
-        if op.type == PLUS:
-            return left.value + right.value
-        elif op.type == MINUS:
-            return left.value - right.value
-        elif op.type == MULT : 
-            return left.value * right.value
-        elif op.type == DIV:
-            return left.value / right.value
-        
-        self.error()      
+        if result is None:
+            self.error()
+        else : 
+            return result
         
 
 def main(): 
